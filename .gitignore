@@ -3,3 +3,4 @@ node_modules
 target
 .idea
 private
+.DS_Store
