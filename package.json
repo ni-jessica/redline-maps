@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "base": "^3.0.0",
-    "mapbox-gl": "^2.10.0",
-    "react-map-gl": "^7.0.19"
-  }
-}
