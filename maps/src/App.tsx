@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Map from "react-map-gl";
+import Map, { ViewStateChangeEvent } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { mapboxToken } from './private/variables';
 import './App.css';
@@ -25,9 +25,13 @@ function App() {
   return (
     <div>
       <Map mapboxAccessToken={mapboxToken}
-        longitude={viewState.longitude}
         latitude={viewState.latitude}
-        zoom={viewState.zoom} />
+        longitude={viewState.longitude}
+        zoom={viewState.zoom} 
+        onMove={(ev: ViewStateChangeEvent) => setViewState(ev.viewState)}
+        style={{width: window.innerWidth, height: window.innerHeight}}
+        mapStyle={'mapbox://styles/mapbox/streets-v11'}
+        />
     </div>
   );
 }
