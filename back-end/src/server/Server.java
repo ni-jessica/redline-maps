@@ -2,8 +2,6 @@ package server;
 
 import static spark.Spark.after;
 
-import java.util.HashMap;
-import java.util.Map;
 import spark.Spark;
 import server.handlers.FilterHandler;
 import server.errors.BadJsonError;
@@ -19,8 +17,10 @@ public class Server {
       response.header("Access-Control-Allow-Methods", "GET");
     });
 
+    //http://localhost:3232/filter?latMin=-80.7456&latMax=-78.7456&lonMin=32.0892&lonMax=37.0892
     /* setup endpoints */
-    Spark.get("filter", new FilterHandler());
+    String dataPath = "src/data/fullDownload.json";
+    Spark.get("filter", new FilterHandler(dataPath));
     Spark.get("*", (request, response) -> new BadJsonError().serialize());
     Spark.init();
     Spark.awaitInitialization();

@@ -1,30 +1,18 @@
 package server.handlers;
 
-import com.squareup.moshi.JsonReader;
-import com.squareup.moshi.Moshi;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import server.ServerUtilities;
+import server.types.Geometry;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import server.errors.BadDatasourceError;
 import server.errors.BadJsonError;
 import server.errors.BadRequestError;
-import data.*;
 import server.types.Feature;
-import server.types.Features;
-import server.types.Geometry;
 
 public class FilterHandler implements Route{
 
@@ -32,15 +20,13 @@ public class FilterHandler implements Route{
   private Double latMin;
   private Double latMax;
   private Double lonMax;
-  private static Moshi moshi;
-  private JsonReader reader;
+  private final String dataPath;
 
   /**
    * constructor for WeatherHandler
    */
-  public FilterHandler(JsonReader reader) {
-    moshi = new Moshi.Builder().build();
-    this.reader = reader;
+  public FilterHandler(String dataPath) {
+    this.dataPath = dataPath;
   }
 
   /**
@@ -58,11 +44,6 @@ public class FilterHandler implements Route{
     String lonMin = request.queryParams("lonMin");
     String lonMax = request.queryParams("lonMax");
 
-    // checking if fields are present
-    if (this.latMin == null || this.latMax == null || this.lonMin == null || this.lonMax == null ) {
-      return new BadRequestError().serialize();
-    }
-
     // checking if fields are in correct coordinate format
     try {
       this.latMin = Double.parseDouble(latMin);
@@ -73,18 +54,23 @@ public class FilterHandler implements Route{
       return new BadJsonError().serialize();
     }
 
-    try {
-      List<Feature> featureList = ServerUtilities.deserializeFeatures(this.reader).getFeatures();
+    // checking if fields are present
+    if (this.latMin == null || this.latMax == null || this.lonMin == null || this.lonMax == null ) {
+      return new BadRequestError().serialize();
+    }
 
+    try {
+      List<Feature> featureList = ServerUtilities.deserializeFeatures(this.dataPath).getFeatures();
       List<Feature> filteredFeatureList = this.filter(featureList);
 
-      Map<String, Object> output = new HashMap<>();
-      output.put("type", "FeatureCollection");
-      output.put("features", filteredFeatureList);
+//      Map<String, Object> output = new HashMap<>();
+//      output.put("type", "FeatureCollection");
+//      output.put("features", filteredFeatureList);
 
-      return ServerUtilities.serialize(output);
+      return new ServerUtilities.FeaturesSuccessResponse(filteredFeatureList).serialize();
 
     } catch (Exception e) {
+      System.out.println(e);
       return new BadDatasourceError().serialize();
     }
   }
@@ -92,11 +78,13 @@ public class FilterHandler implements Route{
   public List<Feature> filter(List<Feature> featureList) {
     List<Feature> filteredFeatureList = new LinkedList<>();
     for (Feature feature : featureList) {
-      List<List<List<List<String>>>> coordinates = feature.getGeometry().getCoordinates();
-
-      List<List<String>> coordinateList = coordinates.get(0).get(0);
-
+      Geometry geometry = feature.getGeometry();
+      if (geometry == null) {
+        continue;
+      }
       // TODO: check for nullness
+
+      List<List<String>> coordinateList = geometry.getCoordinates().get(0).get(0);
 
       for (List<String> pair : coordinateList) {
         // TODO: verify these values are something
