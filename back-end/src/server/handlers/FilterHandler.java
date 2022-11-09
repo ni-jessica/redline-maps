@@ -1,32 +1,46 @@
 package server.handlers;
 
+import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import server.ServerUtilities;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 import server.errors.BadDatasourceError;
 import server.errors.BadJsonError;
 import server.errors.BadRequestError;
+import data.*;
+import server.types.Feature;
+import server.types.Features;
+import server.types.Geometry;
 
 public class FilterHandler implements Route{
 
-  private String latMin;
-  private String latMax;
-  private String lonMin;
-  private String lonMax;
+  private Double lonMin;
+  private Double latMin;
+  private Double latMax;
+  private Double lonMax;
   private static Moshi moshi;
+  private JsonReader reader;
 
   /**
    * constructor for WeatherHandler
    */
-  public FilterHandler() {
+  public FilterHandler(JsonReader reader) {
     moshi = new Moshi.Builder().build();
+    this.reader = reader;
   }
 
   /**
@@ -39,10 +53,10 @@ public class FilterHandler implements Route{
    */
   @Override
   public Object handle(Request request, Response response) throws Exception {
-    this.latMin = request.queryParams("latMin");
-    this.latMax = request.queryParams("latMax");
-    this.lonMin = request.queryParams("lonMin");
-    this.lonMax = request.queryParams("lonMax");
+    String latMin = request.queryParams("latMin");
+    String latMax = request.queryParams("latMax");
+    String lonMin = request.queryParams("lonMin");
+    String lonMax = request.queryParams("lonMax");
 
     // checking if fields are present
     if (this.latMin == null || this.latMax == null || this.lonMin == null || this.lonMax == null ) {
@@ -51,95 +65,50 @@ public class FilterHandler implements Route{
 
     // checking if fields are in correct coordinate format
     try {
-      Float checkValidLat = Float.parseFloat(this.lat);
-      Float checkValidLon = Float.parseFloat(this.lon);
+      this.latMin = Double.parseDouble(latMin);
+      this.latMax = Double.parseDouble(latMax);
+      this.lonMin = Double.parseDouble(lonMin);
+      this.lonMax = Double.parseDouble(lonMax);
     } catch (Exception e) {
       return new BadJsonError().serialize();
     }
 
     try {
-      // get info for forecast endpoint
-      /* for a different external APi, replace the URI with the API link of your choice and update
-      the fields accordingly, ie. for the NWS API it requires latitude and longitude fields */
-      HttpRequest weatherRequest = HttpRequest.newBuilder()
-          .uri(new URI("https://api.weather.gov/points/" + this.lat + "," + this.lon))
-          .GET().
-          build();
-      HttpResponse<String> weatherResponse = HttpClient.newBuilder().build()
-          .send(weatherRequest, BodyHandlers.ofString());
-      String forecastURI = this.deserializeWeather(weatherResponse).properties.forecast;
+      List<Feature> featureList = ServerUtilities.deserializeFeatures(this.reader).getFeatures();
 
-      // make request for forecast
-      HttpRequest forecastRequest = HttpRequest.newBuilder()
-          .uri(new URI(forecastURI))
-          .GET().
-          build();
-      HttpResponse<String> forecastResponse = HttpClient.newBuilder().build()
-          .send(forecastRequest, BodyHandlers.ofString());
+      List<Feature> filteredFeatureList = this.filter(featureList);
 
-      // send forecast response to success response
-      Period forecast = this.deserializeForecast(forecastResponse).properties.periods.get(0);
-      return new WeatherSuccessResponse(
-          this.lat + ", " + this.lon,
-          forecast.temperature.toString() + forecast.temperatureUnit
-      ).serialize();
+      Map<String, Object> output = new HashMap<>();
+      output.put("type", "FeatureCollection");
+      output.put("features", filteredFeatureList);
+
+      return ServerUtilities.serialize(output);
+
     } catch (Exception e) {
       return new BadDatasourceError().serialize();
     }
   }
 
-  /**
-   * Deserializes the response received from the weather URI
-   *
-   * @param weatherResponse the response to deserialize
-   * @return response content, deserialized from Json
-   * @throws IOException
-   */
-  Weather deserializeWeather(HttpResponse<String> weatherResponse) throws IOException {
-    try {
-      return moshi.adapter(Weather.class).fromJson(weatherResponse.body());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
-  }
+  public List<Feature> filter(List<Feature> featureList) {
+    List<Feature> filteredFeatureList = new LinkedList<>();
+    for (Feature feature : featureList) {
+      List<List<List<List<String>>>> coordinates = feature.getGeometry().getCoordinates();
 
-  /**
-   * Deserializes the response received from the forecast URI
-   *
-   * @param forecastResponse the response to deserialize
-   * @return response content, deserialized from Json
-   * @throws IOException
-   */
-  Forecast deserializeForecast(HttpResponse<String> forecastResponse) throws IOException {
-    try {
-      return moshi.adapter(Forecast.class).fromJson(forecastResponse.body());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
-  }
+      List<List<String>> coordinateList = coordinates.get(0).get(0);
 
-  /**
-   * Response object to send, containing the temperature of the input location
-   */
-  public record WeatherSuccessResponse(String result, String coordinates, String temperature) {
+      // TODO: check for nullness
 
-    public WeatherSuccessResponse(String coordinates, String temperature) {
-      this("success", coordinates, temperature);
-    }
+      for (List<String> pair : coordinateList) {
+        // TODO: verify these values are something
+        Double lat = Double.parseDouble(pair.get(0));
+        Double lon = Double.parseDouble(pair.get(1));
 
-    /**
-     * @return this response, serialized as Json
-     */
-    String serialize() {
-      try {
-        return moshi.adapter(WeatherSuccessResponse.class).indent("   ").toJson(this);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw e;
+        if (this.latMax >= lat && this.latMin <= lat && this.lonMax <= lon && this.lonMin <= lon) {
+          filteredFeatureList.add(feature);
+        }
       }
     }
+    return filteredFeatureList;
   }
 }
 
