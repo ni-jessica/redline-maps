@@ -18,6 +18,7 @@ public class Server {
     });
 
     //http://localhost:3232/filter?latMin=-80.7456&latMax=-78.7456&lonMin=32.0892&lonMax=37.0892
+    //http://localhost:3232/filter?latMin=-90&latMax=90&lonMin=-180&lonMax=180
     /* setup endpoints */
     String dataPath = "src/data/fullDownload.json";
     Spark.get("filter", new FilterHandler(dataPath));
