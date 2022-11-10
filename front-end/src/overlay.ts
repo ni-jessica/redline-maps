@@ -4,22 +4,13 @@ import { FeatureCollection } from "geojson";
 // import the raw JSON file
 // import rl_data from "./mockData/fullDownload.json";
 
-
-async function getFilteredData(latMin: number, latMax: number, lonMin: number, lonMax:number): Promise<JSON> {
+export async function getFilteredData(latMin: number, latMax: number, lonMin: number, lonMax:number): Promise<JSON> {
     const response: Response = await fetch(`http://localhost:3232/filter?latMin=${latMin}&latMax=${latMax}&lonMin=${lonMin}&lonMax=${lonMax}`)
     return await response.json();
 }
 // Type predicate for FeatureCollection
-function isFeatureCollection(json: any): json is FeatureCollection {
+export function isFeatureCollection(json: any): json is FeatureCollection {
     return json.type === "FeatureCollection";
-}
-
-export function overlayData(): GeoJSON.FeatureCollection | undefined {
-    const rl_data: JSON = getFilteredData(-90, 90, -180, 180).then((response) => response);
-    if (isFeatureCollection(rl_data)) {
-        return rl_data;
-    }
-    return undefined;
 }
 
 const propertyName = 'holc_grade';

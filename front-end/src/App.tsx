@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Map, { Source, Layer, ViewStateChangeEvent, MapLayerMouseEvent } from "react-map-gl";
-import { overlayData, geoLayer } from './overlay';
+import { getFilteredData, isFeatureCollection, geoLayer } from './overlay';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { mapboxToken } from './private/variables';
 import './App.css';
@@ -25,12 +25,21 @@ function App() {
 
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
 
-
-
   // Run this once, and never refresh (because of the empty dependency list)
   useEffect(() => {
-    setOverlay(overlayData);
-  }, []);
+    async function overlayData() {
+      const rl_data = await getFilteredData(-90.0, 90.0, -180.0, 180.0);
+      if (isFeatureCollection(rl_data)) {
+          console.log("REACHED RL_DATA");
+          console.log(rl_data);
+          setOverlay(rl_data);
+      } 
+      else {
+        setOverlay(undefined);
+      }
+    }
+    overlayData().catch(console.error);
+  }, [])
 
   function onMapClick(e: MapLayerMouseEvent) {
     console.log(e.lngLat.lat);
