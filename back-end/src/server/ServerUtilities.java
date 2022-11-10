@@ -17,10 +17,6 @@ public class ServerUtilities {
   private static final JsonAdapter<Map<String, Object>> jsonAdapter = moshi.adapter(
       Types.newParameterizedType(Map.class, String.class, Object.class));
 
-//  public static String serialize(Map<String, Object> map) {
-//    return jsonAdapter.toJson(map);
-//  }
-
   public record FeaturesSuccessResponse(String type, List<Feature> features) {
 
     public FeaturesSuccessResponse(List<Feature> features) {
