@@ -91,7 +91,7 @@ public class FilterHandler implements Route{
         Double lat = Double.parseDouble(pair.get(0));
         Double lon = Double.parseDouble(pair.get(1));
 
-        if (this.latMax >= lat && this.latMin <= lat && this.lonMax <= lon && this.lonMin <= lon) {
+        if (this.latMax >= lat && this.latMin <= lat && this.lonMax >= lon && this.lonMin <= lon) {
           filteredFeatureList.add(feature);
         }
       }
