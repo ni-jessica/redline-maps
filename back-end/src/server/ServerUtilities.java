@@ -12,19 +12,21 @@ import server.types.Feature;
 import server.types.Features;
 
 public class ServerUtilities {
-
   private static final Moshi moshi = new Moshi.Builder().build();
   private static final JsonAdapter<Map<String, Object>> jsonAdapter = moshi.adapter(
       Types.newParameterizedType(Map.class, String.class, Object.class));
 
   public record FeaturesSuccessResponse(String type, List<Feature> features) {
 
+    /**
+     * returns a response formatted as GeoJSON
+     */
     public FeaturesSuccessResponse(List<Feature> features) {
       this("FeatureCollection", features);
     }
 
     /**
-     * @return this response, serialized as Json
+     * @return the Features response, serialized as Json
      */
     public String serialize() {
       try {
@@ -37,7 +39,7 @@ public class ServerUtilities {
   }
 
   /**
-   * Deserializes the response received from the weather URI
+   * Deserializes the response received from the GeoJSON data
    *
    * @return response content, deserialized from Json
    * @throws IOException

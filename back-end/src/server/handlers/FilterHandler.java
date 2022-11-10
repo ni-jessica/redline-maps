@@ -1,9 +1,7 @@
 package server.handlers;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import server.ServerUtilities;
 import server.types.Geometry;
 import spark.Request;
@@ -14,6 +12,7 @@ import server.errors.BadJsonError;
 import server.errors.BadRequestError;
 import server.types.Feature;
 
+// handles the filter API endpoint
 public class FilterHandler implements Route{
 
   private Double lonMin;
@@ -23,16 +22,16 @@ public class FilterHandler implements Route{
   private final String dataPath;
 
   /**
-   * constructor for WeatherHandler
+   * constructor for FilterHandler
    */
   public FilterHandler(String dataPath) {
     this.dataPath = dataPath;
   }
 
   /**
-   * Get the temperature information from the National Weather API
+   * Gets the filtered red line information from the GeoJSON data or displays appropriate error
    *
-   * @param request  the request to handle
+   * @param request the request to handle
    * @param response use to modify properties of the response
    * @return response content
    * @throws Exception This is part of the interface; we don't throw anything.
@@ -63,10 +62,6 @@ public class FilterHandler implements Route{
       List<Feature> featureList = ServerUtilities.deserializeFeatures(this.dataPath).getFeatures();
       List<Feature> filteredFeatureList = this.filter(featureList);
 
-//      Map<String, Object> output = new HashMap<>();
-//      output.put("type", "FeatureCollection");
-//      output.put("features", filteredFeatureList);
-
       return new ServerUtilities.FeaturesSuccessResponse(filteredFeatureList).serialize();
 
     } catch (Exception e) {
@@ -75,19 +70,24 @@ public class FilterHandler implements Route{
     }
   }
 
+  /**
+   * filters the data's list of Feature to only have the ones whose coordinates are contained
+   * within the provided bounds
+   * @param featureList the data's List of Feature
+   * @return the filtered featureList
+   */
   public List<Feature> filter(List<Feature> featureList) {
     List<Feature> filteredFeatureList = new LinkedList<>();
     for (Feature feature : featureList) {
       Geometry geometry = feature.getGeometry();
+      // skip this feature if it doesn't have geometry (and therefore doesn't have coordinates)
       if (geometry == null) {
         continue;
       }
-      // TODO: check for nullness
 
       List<List<String>> coordinateList = geometry.getCoordinates().get(0).get(0);
 
       for (List<String> pair : coordinateList) {
-        // TODO: verify these values are something
         Double lat = Double.parseDouble(pair.get(0));
         Double lon = Double.parseDouble(pair.get(1));
 

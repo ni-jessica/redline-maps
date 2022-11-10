@@ -1,13 +1,16 @@
 import { FillLayer } from "react-map-gl";
 import { FeatureCollection } from "geojson";
 
-// import the raw JSON file
-// import rl_data from "./mockData/fullDownload.json";
-
+/**
+ * retrieves the bounded data from the API server;
+ * takes in minimum/maximum latitude and longitude bounds;
+ * returns a Promise;
+ **/
 export async function getFilteredData(latMin: number, latMax: number, lonMin: number, lonMax:number): Promise<JSON> {
     const response: Response = await fetch(`http://localhost:3232/filter?latMin=${latMin}&latMax=${latMax}&lonMin=${lonMin}&lonMax=${lonMax}`)
     return await response.json();
 }
+
 // Type predicate for FeatureCollection
 export function isFeatureCollection(json: any): json is FeatureCollection {
     return json.type === "FeatureCollection";
@@ -15,6 +18,7 @@ export function isFeatureCollection(json: any): json is FeatureCollection {
 
 const propertyName = 'holc_grade';
 
+// styles the redline data
 export const geoLayer: FillLayer = {
     id: 'geo_data',
     type: 'fill',
@@ -32,6 +36,6 @@ export const geoLayer: FillLayer = {
             '#d11d1d',
             '#ccc'
         ],
-        'fill-opacity': 0.2
+        'fill-opacity': 0.01
     }
 };
