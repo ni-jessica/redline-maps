@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type":"Feature","geometry":{"type":"MultiPolygon","coordinates": [[[[-10, -10], [-10, 10], [10, 10], [10, -10]]]]}, "properties":  "lorem ipsum"}, {"type":"Feature","geometry":{"type":"MultiPolygon","coordinates": [[[[5, 5], [10, 5], [7, 3], [18, 4]]]]}, "properties":  "lorem ipsum"}]}

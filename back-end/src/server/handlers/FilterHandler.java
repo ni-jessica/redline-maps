@@ -22,10 +22,21 @@ public class FilterHandler implements Route{
   private final String dataPath;
 
   /**
-   * constructor for FilterHandler
+   * Constructor for FilterHandler
    */
   public FilterHandler(String dataPath) {
     this.dataPath = dataPath;
+  }
+
+  /**
+   * Constructor for FilterHandler for testing
+   */
+  public FilterHandler(String dataPath, Double latMin, Double latMax, Double lonMin, Double lonMax) {
+    this.dataPath = dataPath;
+    this.latMin = latMin;
+    this.latMax = latMax;
+    this.lonMin = lonMin;
+    this.lonMax = lonMax;
   }
 
   /**
@@ -88,6 +99,9 @@ public class FilterHandler implements Route{
       List<List<String>> coordinateList = geometry.getCoordinates().get(0).get(0);
 
       for (List<String> pair : coordinateList) {
+        if (pair.isEmpty()) {
+          continue;
+        }
         Double lat = Double.parseDouble(pair.get(0));
         Double lon = Double.parseDouble(pair.get(1));
 
