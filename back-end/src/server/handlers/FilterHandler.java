@@ -98,7 +98,9 @@ public class FilterHandler implements Route{
 
       List<List<String>> coordinateList = geometry.getCoordinates().get(0).get(0);
 
+      Integer validCoordinates = 0;
       for (List<String> pair : coordinateList) {
+        // empty coordinate list
         if (pair.isEmpty()) {
           continue;
         }
@@ -106,7 +108,15 @@ public class FilterHandler implements Route{
         Double lon = Double.parseDouble(pair.get(1));
 
         if (this.latMax >= lat && this.latMin <= lat && this.lonMax >= lon && this.lonMin <= lon) {
-          filteredFeatureList.add(feature);
+          validCoordinates += 1;
+          // continue checking coordinates if this is not the last in the list
+          if (!validCoordinates.equals(coordinateList.size())) {
+            continue;
+          } else {
+            filteredFeatureList.add(feature); // if all coordinates were valid, add feature to the list
+          }
+        } else {
+          break;
         }
       }
     }
