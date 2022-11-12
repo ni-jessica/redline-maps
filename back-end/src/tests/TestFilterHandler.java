@@ -84,7 +84,6 @@ public class TestFilterHandler {
   }
 
   @Test
-  /* testing weather connection */
   public void testAPINoFilter() throws IOException {
     HttpURLConnection clientConnection = tryRequest("filter");
     assertEquals(200, clientConnection.getResponseCode());
