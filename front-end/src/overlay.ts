@@ -36,6 +36,6 @@ export const geoLayer: FillLayer = {
             '#d11d1d',
             '#ccc'
         ],
-        'fill-opacity': 0.01
+        'fill-opacity': 0.1
     }
 };
