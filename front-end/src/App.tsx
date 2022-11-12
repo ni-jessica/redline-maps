@@ -20,7 +20,7 @@ function App() {
   const [viewState, setViewState] = useState({
     latitude: coordinates.lat,
     longitude: coordinates.long,
-    zoom: 5
+    zoom: 10
   })
 
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(undefined);
