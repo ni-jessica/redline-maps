@@ -100,5 +100,89 @@ public class TestFilterHandler {
     assertEquals(new LinkedList<>(), filterEmpty.filter(mockListFeature));
   }
 
+  @Test
+  public void testFilterNone() throws IOException {
+    FilterHandler filterNone = new FilterHandler("../data/mockData.json", 0.0, 0.0, 0.0, 0.0);
+
+    List<List<List<List<String>>>> coordinates1 = new ArrayList<>();
+    coordinates1.add(new ArrayList<>());
+    coordinates1.get(0).add(new ArrayList<>());
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","-10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","-10.0")));
+    Map properties1 = new HashMap();
+    Feature feature1 = new Feature("Feature", new Geometry("MultiPolygon", coordinates1), properties1);
+
+    List<List<List<List<String>>>> coordinates2 = new ArrayList<>();
+    coordinates2.add(new ArrayList<>());
+    coordinates2.get(0).add(new ArrayList<>());
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("5.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("10.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("7.0","3.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("18.0","4.0")));
+    Map properties2 = new HashMap();
+    Feature feature2 = new Feature("Feature", new Geometry("MultiPolygon", coordinates2), properties2);
+
+    List<Feature> mockListFeature = new ArrayList(List.of(feature1, feature2));
+    assertEquals(new LinkedList<>(), filterNone.filter(mockListFeature));
+  }
+
+  @Test
+  public void testFilterSome() throws IOException {
+    FilterHandler filterSome = new FilterHandler("../data/mockData.json", 4.0, 20.0, 2.0, 6.0);
+
+    List<List<List<List<String>>>> coordinates1 = new ArrayList<>();
+    coordinates1.add(new ArrayList<>());
+    coordinates1.get(0).add(new ArrayList<>());
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","-10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","-10.0")));
+    Map properties1 = new HashMap();
+    Feature feature1 = new Feature("Feature", new Geometry("MultiPolygon", coordinates1), properties1);
+
+    List<List<List<List<String>>>> coordinates2 = new ArrayList<>();
+    coordinates2.add(new ArrayList<>());
+    coordinates2.get(0).add(new ArrayList<>());
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("5.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("10.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("7.0","3.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("18.0","4.0")));
+    Map properties2 = new HashMap();
+    Feature feature2 = new Feature("Feature", new Geometry("MultiPolygon", coordinates2), properties2);
+
+    List<Feature> mockListFeature = new ArrayList(List.of(feature1, feature2));
+    assertEquals(new LinkedList(List.of(feature2)), filterSome.filter(mockListFeature));
+  }
+
+  @Test
+  public void testFilterAll() throws IOException {
+    FilterHandler filterAll = new FilterHandler("../data/mockData.json", -20.0, 20.0, -20.0, 20.0);
+
+    List<List<List<List<String>>>> coordinates1 = new ArrayList<>();
+    coordinates1.add(new ArrayList<>());
+    coordinates1.get(0).add(new ArrayList<>());
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","-10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("-10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","10.0")));
+    coordinates1.get(0).get(0).add(new ArrayList(List.of("10.0","-10.0")));
+    Map properties1 = new HashMap();
+    Feature feature1 = new Feature("Feature", new Geometry("MultiPolygon", coordinates1), properties1);
+
+    List<List<List<List<String>>>> coordinates2 = new ArrayList<>();
+    coordinates2.add(new ArrayList<>());
+    coordinates2.get(0).add(new ArrayList<>());
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("5.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("10.0","5.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("7.0","3.0")));
+    coordinates2.get(0).get(0).add(new ArrayList(List.of("18.0","4.0")));
+    Map properties2 = new HashMap();
+    Feature feature2 = new Feature("Feature", new Geometry("MultiPolygon", coordinates2), properties2);
+
+    List<Feature> mockListFeature = new ArrayList(List.of(feature1, feature2));
+    assertEquals(mockListFeature, filterAll.filter(mockListFeature));
+  }
+
 
 }
