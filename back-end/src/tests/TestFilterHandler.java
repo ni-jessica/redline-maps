@@ -172,15 +172,14 @@ public class TestFilterHandler {
 
   @Test
   public void fuzzTestFilter() {
+    List<Feature> mockFeatureList = makeMockFeatureList();
+
     for (int i = 0; i < 500; i++) {
       Double latMin = Math.random() * 1000 - 500;
       Double latMax = Math.random() * 1000 - 500;
       Double lonMin = Math.random() * 1000 - 500;
       Double lonMax = Math.random() * 1000 - 500;
       FilterHandler fuzzFilter = new FilterHandler("../data/mockData.json", latMin, latMax, lonMin, lonMax);
-
-      List<Feature> mockFeatureList = makeMockFeatureList();
-
       fuzzFilter.filter(mockFeatureList);
     }
   }
