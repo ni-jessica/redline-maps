@@ -113,7 +113,10 @@ public class FilterHandler implements Route{
           if (!validCoordinates.equals(coordinateList.size())) {
             continue;
           } else {
-            filteredFeatureList.add(feature); // if all coordinates were valid, add feature to the list
+            filteredFeatureList.add(new Feature(
+                    feature.getType(),
+                    feature.getGeometry(),
+                    feature.getProperties())); // if all coordinates were valid, add feature to the list
           }
         } else {
           break;
