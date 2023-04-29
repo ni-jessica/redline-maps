@@ -2,13 +2,8 @@
 
 Cedric Sirianni, Jessica Ni
 
-<https://github.com/cs0320-f2022/integration-csiriann-jni20>
-
-Estimated time to complete: 12 hours
-
-## Collaborators
-
-N/A
+## Purpose 
+Use MapBox API and public redlining data to visualize history of inequality throughout US cities. API server supports bounding box query to filter geographical data.
 
 ## Design Choices
 
@@ -16,17 +11,13 @@ We organized our project into two sections: front-end and back-end. The front-en
 
 ### Front-end
 
-To produce the map, we created an `App` component that renders several nested components. As per the gear up, we used the `Map`, `Source,` and `Layer` components. This involved using states for the `viewState` and `overlay`. 
+To produce the map, we created an `App` component that renders several nested components: `Map`, `Source,` and `Layer`. This involved using states for the `viewState` and `overlay`. 
 
 The data for redlining was fetched from the back-end code. We used a `useEffect` hook to render this data one time only. The `overlay` state is modified in the lambda expression defined within the `useEffect` hook.
 
 ### Back-end
 
-To provide the data to the front-end, we created a `filter` endpoint using the `FilterHander`. The back-end stores the full GeoJSON data. We then filter the data according to the minimum and maximum latitude and longitude specified in the GET request. This computation is $\theta(n)$ for a list of `Feature`s length $n$. That is quite expensive, and sorting could potentially improve runtime significantly. Optimization of this filtration is beyond the scope of this assingment, though.
-
-## Errors/Bugs
-
-N/A
+To provide the data to the front-end, we created a `filter` endpoint using the `FilterHander`. The back-end stores the full GeoJSON data. We then filter the data according to the minimum and maximum latitude and longitude specified in the GET request. This computation is $\theta(n)$ for a list of `Feature`s length $n$. That is quite expensive, and sorting could potentially improve runtime significantly. 
 
 ## Testing
 
